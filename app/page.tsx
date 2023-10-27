@@ -1,6 +1,9 @@
 import AcmeLogo from '@/app/ui/acme-logo';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { lusitana } from './ui/fonts';
+
 export default function Page() {
   return (
     <main className="flex min-h-screen flex-col p-6">
@@ -12,7 +15,7 @@ export default function Page() {
           <div
             className='h-0 w-0 border-b-[30px] border-l-[20px] border-r-[20px] border-b-black border-l-transparent border-r-transparent'
           />
-          <p className={`text-xl text-gray-800 md:text-3xl md:leading-normal`}>
+          <p className={`text-xl text-gray-800 md:text-3xl md:leading-normal ${lusitana.className}`}>
             <strong>Welcome to Acme.</strong> This is the example for the{' '}
             <a href="https://nextjs.org/learn/" className="text-blue-500">
               Next.js Learn Course
@@ -28,6 +31,20 @@ export default function Page() {
         </div>
         <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
           {/* Add Hero Images Here */}
+          <Image
+            src="/hero-desktop.png"
+            alt="Screenshots of the dashboard project showing desktop and mobile versions"
+            width={1000}
+            height={760}
+            className="hidden md:block"
+          />
+          <Image
+            src="/hero-mobile.png"
+            alt="Screenshots of the dashboard project showing desktop and mobile versions"
+            width={560}
+            height={620}
+            className="block md:hidden"
+          />
         </div>
       </div>
     </main>
