@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-// import { signIn } from '@/auth';
+import { signIn } from '@/auth';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -21,8 +21,7 @@ const FormSchema = z.object({
 });
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
-const UpdateInvoice = FormSchema.omit({ date: true });
-const DeleteInvoice = FormSchema.pick({ id: true });
+const UpdateInvoice = FormSchema.omit({ date: true, id: true });
 
 // This is temporary
 export type State = {
@@ -73,9 +72,12 @@ export async function createInvoice(prevState: State, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(prevState: State, formData: FormData) {
+export async function updateInvoice(
+  id: string,
+  prevState: State,
+  formData: FormData,
+) {
   const validatedFields = UpdateInvoice.safeParse({
-    id: formData.get('id'),
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
@@ -88,7 +90,7 @@ export async function updateInvoice(prevState: State, formData: FormData) {
     };
   }
 
-  const { id, customerId, amount, status } = validatedFields.data;
+  const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
 
   try {
@@ -105,12 +107,8 @@ export async function updateInvoice(prevState: State, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function deleteInvoice(formData: FormData) {
+export async function deleteInvoice(id: string) {
   // throw new Error('Failed to Delete Invoice');
-
-  const { id } = DeleteInvoice.parse({
-    id: formData.get('id'),
-  });
 
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
@@ -121,16 +119,16 @@ export async function deleteInvoice(formData: FormData) {
   }
 }
 
-// export async function authenticate(
-//   prevState: string | undefined,
-//   formData: FormData,
-// ) {
-//   try {
-//     await signIn('credentials', Object.fromEntries(formData));
-//   } catch (error) {
-//     if ((error as Error).message.includes('CredentialsSignin')) {
-//       return 'CredentialsSignin';
-//     }
-//     throw error;
-//   }
-// }
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', Object.fromEntries(formData));
+  } catch (error) {
+    if ((error as Error).message.includes('CredentialsSignin')) {
+      return 'CredentialsSignin';
+    }
+    throw error;
+  }
+}
